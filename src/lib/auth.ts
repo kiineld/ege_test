@@ -8,6 +8,9 @@ import {NextRequest} from "next/server";
 
 
 export const auth = betterAuth({
+    logger: {
+        level: "debug"
+    },
     database: drizzleAdapter(db, {
         provider: 'pg', // or 'sqlite' or 'mysql'
         schema: {
@@ -31,8 +34,8 @@ export const auth = betterAuth({
         //     clientSecret: process.env.GITHUB_CLIENT_SECRET as string,
         // },
         vk: {
-            clientId: process.env.VK_CLIENT_ID as string,
-            clientSecret: process.env.VK_CLIENT_SECRET as string,
+            clientId: process.env.VK_CLIENT_ID!,
+            clientSecret: process.env.VK_CLIENT_SECRET!,
         },
     },
     session: {

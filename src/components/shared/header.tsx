@@ -22,13 +22,7 @@ export default function Header(){
                         <Button variant="outline">
                             <Link href="/login" className="flex gap-2 justify-center items-center">
                                 {session.user.name}
-                                <Image
-                                    src={session.user.image}
-                                    alt={session.user.name}
-                                    width={20}
-                                    height={16}
-                                    className="rounded-full"
-                                />
+                                {session.user.image && <Image src={session.user.image} alt={session.user.name} width={20} height={16} className="rounded-full" />}
                             </Link>
                         </Button>
                     </div>

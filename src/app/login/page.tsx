@@ -34,9 +34,9 @@ export default function LoginPage() {
                 provider: 'google',
                 callbackURL: '/dashboard',
             })
-        } catch (err) {
+        } catch (error) {
             setError('Произошла ошибка. Попробойте обновить страницу.')
-            console.error('Google sign-in error:', err)
+            console.error('Google sign-in error:', error)
         } finally {
             setIsLoading(false)
         }
@@ -47,12 +47,12 @@ export default function LoginPage() {
         setError(null)
         try {
             await signIn.social({
-                provider: 'VK',
+                provider: 'vk',
                 callbackURL: '/dashboard',
             })
-        } catch (err) {
+        } catch (error) {
             setError('Произошла ошибка. Попробойте обновить страницу.')
-            console.error('Vk sign-in error:', err)
+            console.error('Vk sign-in error:', error)
         } finally {
             setIsLoading(false)
         }

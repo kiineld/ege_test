@@ -1,27 +1,68 @@
-import { integer, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+import { pgTable, text, timestamp, boolean, integer } from 'drizzle-orm/pg-core'
 
-export const usersTable = pgTable('users_table', {
-    id: serial('id').primaryKey(),
+export const users = pgTable('users', {
+    id: text('id').primaryKey(),
     name: text('name').notNull(),
-    age: integer('age').notNull(),
     email: text('email').notNull().unique(),
-});
-
-export const postsTable = pgTable('posts_table', {
-    id: serial('id').primaryKey(),
-    title: text('title').notNull(),
-    content: text('content').notNull(),
-    userId: integer('user_id')
-        .notNull()
-        .references(() => usersTable.id, { onDelete: 'cascade' }),
+    emailVerified: boolean('email_verified').notNull().default(false),
+    image: text('image'),
     createdAt: timestamp('created_at').notNull().defaultNow(),
-    updatedAt: timestamp('updated_at')
-        .notNull()
-        .$onUpdate(() => new Date()),
-});
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
 
-export type InsertUser = typeof usersTable.$inferInsert;
-export type SelectUser = typeof usersTable.$inferSelect;
+export const sessions = pgTable('sessions', {
+    id: text('id').primaryKey(),
+    expiresAt: timestamp('expires_at').notNull(),
+    token: text('token').notNull().unique(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+    ipAddress: text('ip_address'),
+    userAgent: text('user_agent'),
+    userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+})
 
-export type InsertPost = typeof postsTable.$inferInsert;
-export type SelectPost = typeof postsTable.$inferSelect;
+export const accounts = pgTable('accounts', {
+    id: text('id').primaryKey(),
+    accountId: text('account_id').notNull(),
+    providerId: text('provider_id').notNull(),
+    userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    accessToken: text('access_token'),
+    refreshToken: text('refresh_token'),
+    idToken: text('id_token'),
+    accessTokenExpiresAt: timestamp('access_token_expires_at'),
+    refreshTokenExpiresAt: timestamp('refresh_token_expires_at'),
+    scope: text('scope'),
+    password: text('password'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export const verifications = pgTable('verifications', {
+    id: text('id').primaryKey(),
+    identifier: text('identifier').notNull(),
+    value: text('value').notNull(),
+    expiresAt: timestamp('expires_at').notNull(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+// EGE-specific tables
+export const userProfiles = pgTable('user_profiles', {
+    id: text('id').primaryKey(),
+    userId: text('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    targetSubject: text('target_subject'),
+    targetScore: integer('target_score'),
+    currentLevel: integer('current_level').default(1),
+    totalXP: integer('total_xp').default(0),
+    currentStreak: integer('current_streak').default(0),
+    longestStreak: integer('longest_streak').default(0),
+    lastActivityDate: timestamp('last_activity_date'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow(),
+})
+
+export type User = typeof users.$inferSelect
+export type NewUser = typeof users.$inferInsert
+export type Session = typeof sessions.$inferSelect
+export type Account = typeof accounts.$inferSelect
+export type UserProfile = typeof userProfiles.$inferSelect

@@ -1,12 +1,63 @@
-"use client"
+'use client'
 
-import { Button } from "@/components/ui/button";
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { signIn, useSession } from '@/lib/auth-client'
+import { useEffect } from 'react'
 import {Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
+import {Button} from "@/components/ui/button";
 import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {FaGoogle, FaVk} from "react-icons/fa";
 
 export default function LoginPage() {
+    const [isLoading, setIsLoading] = useState(false)
+    const [error, setError] = useState<string | null>(null)
+    const router = useRouter()
+    const { data: session } = useSession()
+
+    useEffect(() => {
+        if (session) {
+            router.push('/dashboard')
+        }
+    }, [session, router])
+
+    if (session) {
+        return <div>Redirecting...</div>
+    }
+
+    const handleGoogleSignIn = async () => {
+        setIsLoading(true)
+        setError(null)
+        try {
+            await signIn.social({
+                provider: 'google',
+                callbackURL: '/dashboard',
+            })
+        } catch (err) {
+            setError('Произошла ошибка. Попробойте обновить страницу.')
+            console.error('Google sign-in error:', err)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const handleVkSignIn = async () => {
+        setIsLoading(true)
+        setError(null)
+        try {
+            await signIn.social({
+                provider: 'VK',
+                callbackURL: '/dashboard',
+            })
+        } catch (err) {
+            setError('Произошла ошибка. Попробойте обновить страницу.')
+            console.error('Vk sign-in error:', err)
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
     return (
         <div className="flex justify-center items-center min-h-screen w-7xl">
             <Card className="w-full max-w-sm">
@@ -51,10 +102,12 @@ export default function LoginPage() {
                         Войти
                     </Button>
                     <div className="flex w-full gap-2">
-                        <Button variant="outline" className="grow">
+                        <Button variant="outline" disabled={isLoading} onClick={handleGoogleSignIn} className="grow">
+                            {isLoading ? 'Вход в' : 'Войти с'}
                             <FaGoogle/>
                         </Button>
-                        <Button variant="outline" className="grow">
+                        <Button variant="outline" disabled={isLoading} onClick={handleVkSignIn} className="grow">
+                            {isLoading ? 'Вход в' : 'Войти с'}
                             <FaVk/>
                         </Button>
                     </div>

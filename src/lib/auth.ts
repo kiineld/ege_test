@@ -3,6 +3,9 @@ import { drizzleAdapter } from 'better-auth/adapters/drizzle'
 import { db } from '@/db'
 import * as schema from '../db/schema'
 import {eq} from "drizzle-orm";
+import {User} from "@/db/schema";
+import {NextRequest} from "next/server";
+
 
 export const auth = betterAuth({
     database: drizzleAdapter(db, {
@@ -37,7 +40,7 @@ export const auth = betterAuth({
         updateAge: 60 * 60 * 24, // 24 hours
     },
     callbacks: {
-        async onSignUp(user, request) {
+        async onSignUp(user: User, request: NextRequest) {
             // Create user profile after successful signup
             await db.insert(schema.userProfiles).values({
                 id: crypto.randomUUID(),
@@ -53,7 +56,7 @@ export const auth = betterAuth({
             console.log('New user signed up:', user.email)
             return user
         },
-        async onSignIn(user, request) {
+        async onSignIn(user: User, request: NextRequest) {
             // Update last activity
             await db.update(schema.userProfiles)
                 .set({
